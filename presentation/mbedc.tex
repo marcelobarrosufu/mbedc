@@ -6,10 +6,12 @@
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{courier}
 
 \definecolor{lightlightgray}{gray}{0.9}
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
 \definecolor{CadetBlue}{cmyk}{0.62,0.57,0.23,0}
+\definecolor{codeback}{gray}{0.95}
 
 \lstdefinestyle{CStyle}{
 	basicstyle=\ttfamily,
@@ -36,11 +38,12 @@
 	xleftmargin=\parindent,
 	language=C,
 	showstringspaces=false,
-	basicstyle=\footnotesize\ttfamily,
+	basicstyle=\scriptsize\ttfamily,
 	keywordstyle=\bfseries\color{green!40!black},
 	commentstyle=\itshape\color{purple!40!black},
 	identifierstyle=\color{blue},
 	stringstyle=\color{orange},
+	backgroundcolor = \color{codeback},
 }
 
 \title{Linguagem C}
@@ -120,14 +123,68 @@
 	}
 \end{frame}
 
+
+\begin{frame}
+	\frametitle{Estrutura de uma aplicação}
+	\begin{center}
+		\includegraphics[scale=0.6]{imgs/compile_process.png}
+	\end{center}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de inclusão}
+	\begin{columns}[T] % align columns
+		\begin{column}{.60\textwidth}
+			\lstinputlisting[style=customc]{code/demo.h}
+		\end{column}%
+		\hfill%
+		\begin{column}{.40\textwidth}
+			\begin{itemize}
+				\item Pense como API: só exporte interfaces e o que elas precisarem !
+				\item Não esqueça a proteção de inclusão recursiva !				
+				\item Não é ANSI-C mas \texttt{\textcolor{blue}{\#pragma once}} pode ser interessante
+				\item Evite incluir arquivos de inclusão como boa prática
+			\end{itemize}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de inclusão}
+	\lstinputlisting[style=customc]{code/accel.h}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de código fonte}
+	\begin{columns}[T] % align columns
+		\begin{column}{.60\textwidth}
+			\lstinputlisting[style=customc]{code/demo.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.40\textwidth}
+			\begin{itemize}
+				\item Externe via funções o acesso a seus dados internos (encapsulamento)
+				\item Dê escopo de arquivo para as suas funções e variáveis com static !
+				\item Salve RAM colocando como const o que for realmente constante.
+			\end{itemize}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de código fonte}
+	\lstinputlisting[style=customc]{code/accel.c}
+\end{frame}
+
+
 \begin{frame}[fragile]
 	\begin{lstlisting}[style=customc]
-// test
-#include <stdio.h>
-int main(void)
-{
-	printf("Hello World!"); 
-}
+		// test
+		#include <stdio.h>
+		int main(void)
+		{
+			printf("Hello World!"); 
+		}
 	\end{lstlisting}
 \end{frame}
 
@@ -137,5 +194,6 @@ int main(void)
 		\item x
 	\end{itemize}	
 \end{frame}
+
 
 \end{document}
