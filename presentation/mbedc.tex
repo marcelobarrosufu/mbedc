@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{courier}
+\usepackage{tikz}
 
 \definecolor{lightlightgray}{gray}{0.9}
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
@@ -223,7 +224,13 @@
 \end{frame}
 
 \begin{frame}
-	\frametitle{Retorno de valores locais}
+	\frametitle{Retorno de valores locais, da pilha, pode ?}
+	\begin{center}
+	\lstinputlisting[style=customc]{code/stack_ret_a.c}
+	\end{center}	
+	\begin{tikzpicture}[remember picture, overlay]
+		\node [] at (current page.left=10)	{\includegraphics[scale=0.8]{imgs/ok.png}};
+	\end{tikzpicture}
 \end{frame}
 
 \begin{frame}
@@ -307,6 +314,7 @@
 		\begin{column}{.43\textwidth}
 			\begin{itemize}
 				\item Agora \texttt{var} tem \textbf{linkagem interna}, não é mais vista fora de file2.c (o símbolo não é exportado)
+				\item Conceito também válido para funções \texttt{static} !
 				\item Princípio de encapsulamento ou API.
 			\end{itemize}
 		\end{column}%
@@ -336,8 +344,8 @@
 		\begin{column}{.40\textwidth}
 			\begin{itemize}
 				\item Externe via funções o acesso a seus dados internos (encapsulamento)
-				\item Dê escopo de arquivo para as suas funções e variáveis com static !
-				\item Salve RAM colocando como const o que for realmente constante.
+				\item Dê escopo de arquivo para as suas funções e variáveis com \texttt{static} !
+				\item Salve RAM colocando como \texttt{const} o que for realmente constante.
 			\end{itemize}
 		\end{column}%
 	\end{columns}

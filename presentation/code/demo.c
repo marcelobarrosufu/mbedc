@@ -1,4 +1,4 @@
-// inclusoes da lib c
+// inclusoes da linguagem C
 
 // inclusoes do projeto
 
