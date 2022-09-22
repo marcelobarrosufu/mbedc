@@ -155,6 +155,178 @@
 \end{frame}
 
 \begin{frame}
+	\frametitle{Especificadores de classe de armazenamento}
+	\begin{center}
+		\texttt{\textcolor{blue}{static extern auto register}}
+	\end{center}
+	\begin{itemize}
+		\vspace*{0.5cm}
+	\item Uma das características pouco entendidas da linguagem C e frequentemente mal empregadas.
+	\item Permitem detalhar a declaração de uma variável, com relação a linkagem, localização, escopo e valores iniciais.
+	\item É confuso pois o significado pode mudar de acordo com a posição no código fonte.
+	\item Mas, precisamos entender antes como as variáveis são armazenadas !
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Stack (Pilha)}
+	\begin{itemize}
+		\item Geralmente usado para alocação de variáveis temporárias ou passagem de parâmetros.
+		\item É uma região linear de memória, gerida por um registro denominado de \textit{Stack Pointer}.
+		\item O compilador analisa o código e gerar instruções para uso do stack.
+	\end{itemize}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Stack (Pilha)}
+	\begin{columns}[T] % align columns
+	\begin{column}{.60\textwidth}
+		\lstinputlisting[style=customc]{code/stack.c}
+	\end{column}%
+	\hfill%
+	\begin{column}{.40\textwidth}
+		Análise:
+	\end{column}%
+\end{columns}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Cuidados no uso da pilha}
+	\begin{itemize}
+	\item Tamanho de variáveis e estouro de pilha
+	\item Recursão ou longo encadeamento de chamadas
+	\item Retorno de valores locais
+	\item Dimensionamento da pilha
+	\end{itemize}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Uso de static em variáveis locais}
+	\begin{itemize}
+	\item Escopo local (não visível fora da função)
+	\item Armazenamento em área global (não usa pilha)
+	\item Permite valores de inicialização.
+	\end{itemize}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Stack (Pilha)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.60\textwidth}
+			\lstinputlisting[style=customc]{code/static_var_fun.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.40\textwidth}
+			Análise:
+		\end{column}%
+	\end{columns}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Retorno de valores locais}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Passagem por valor x passagem por referência}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Formas de dimensionamento da pilha}
+	\begin{itemize}
+		\item Análises estáticas
+		\begin{itemize}
+			\item Usando o próprio compilador (\texttt{-fstack-usage} e \texttt{-fcallgraph-info} no GCC) e analisando o uso da pilha a partir do \texttt{main()} (análise estática)
+			\item Usando ferramentas (PC-Lint, valgrind, cppcheck)
+			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ponteiros para função)
+		\end{itemize}
+		\item Análises dinâmicas: técnica da marca d'agua na região do stack (verificação dinâmica, útil em caso de recursão, interrupção)
+		\end{itemize}		
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento (auto)}
+\begin{columns}[T] % align columns
+	\begin{column}{.60\textwidth}
+		\lstinputlisting[style=customc]{code/auto.c}
+	\end{column}%
+	\hfill%
+	\begin{column}{.40\textwidth}
+		\begin{center}
+			\texttt{\textcolor{blue}{auto}}
+		\end{center}
+		\vspace*{0.5cm}
+		\begin{itemize}
+			\item É a classe padrão, de escopo local, armazenadas na RAM (pilha), valor inicial pode ser lixo.
+			\item Pode ser omitida, por simplicidade.
+		\end{itemize}
+	\end{column}%
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento}
+		\begin{center}
+		\texttt{\textcolor{blue}{static}}
+		\end{center}
+		\vspace*{0.5cm}
+		\begin{itemize}
+			\item Se usada com variáveis dentro de funções: gera variáveis que mantem valores entre chamadas e são alocadas na área de variáveis globais. São inicializadas com zero, caso não explicitamente especificado.
+			\item Se usada com variáveis no escopo do arquivo (fora das funções) o comportamento é o mesmo mas existem diferenças em relação a sua visibilidade.
+			\item \texttt{static} também pode ser usada em declarações de função. Novamente, implica em mudança de visibilidade.
+			\item Novo conceito requerido: \textbf{linkagem padrão da linguagem C} !
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento (extern)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.57\textwidth}
+			\lstinputlisting[style=customc]{code/static_linkage_b.c}
+			\lstinputlisting[style=customc]{code/static_linkage_a.c}			
+		\end{column}%
+		\hfill%
+		\begin{column}{.43\textwidth}
+			\begin{itemize}
+				\item Por default, o compilador C externa todos os símbolos gerados (main,var).
+				\item Com \texttt{extern}, você pode explicitamente dizer que existe algo externo ao seu arquivo (file2.c) e que pretende usar.
+			\item No entanto, mesmo que não especifique nada, o linker vai tentar encontrar algo na tabela de símbolos que resolva a referência.
+			\end{itemize}
+		\end{column}%
+	\end{columns}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento (static/extern)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.57\textwidth}
+			\lstinputlisting[style=customc]{code/static_linkage_e.c}			
+			\lstinputlisting[style=customc]{code/static_linkage_d.c}
+			\lstinputlisting[style=customc]{code/static_linkage_c.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.43\textwidth}
+			\begin{itemize}
+				\item Agora \texttt{var} tem \textbf{linkagem interna}, não é mais vista fora de file2.c (o símbolo não é exportado)
+				\item Princípio de encapsulamento ou API.
+			\end{itemize}
+		\end{column}%
+	\end{columns}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento}
+	\begin{center}
+		\texttt{\textcolor{blue}{register}}
+	\end{center}
+	\vspace*{0.5cm}
+	\begin{itemize}
+		\item Se usada com variáveis dentro de funções.
+		\item Indica ao compilador que deseja o armazenamento da variável em um registro do processador (geralmente para maior performance).
+		\item Pouco útil atualmente, em geral o compilador resolve bem essas situações.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
 	\frametitle{Arquivos de código fonte}
 	\begin{columns}[T] % align columns
 		\begin{column}{.60\textwidth}
@@ -197,3 +369,6 @@
 
 
 \end{document}
+
+
+% https://aticleworld.com/dangling-pointer-and-memory-leak/
