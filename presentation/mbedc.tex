@@ -8,6 +8,7 @@
 \usepackage{color}
 \usepackage{courier}
 \usepackage{tikz}
+\usepackage{verbatim}
 
 \definecolor{lightlightgray}{gray}{0.9}
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
@@ -228,13 +229,94 @@
 	\begin{center}
 	\lstinputlisting[style=customc]{code/stack_ret_a.c}
 	\end{center}	
+	\pause
 	\begin{tikzpicture}[remember picture, overlay]
-		\node [] at (current page.left=10)	{\includegraphics[scale=0.8]{imgs/ok.png}};
+		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
+		\node [xshift=-2cm,yshift=-6cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
+		\node [xshift=-2cm,yshift=-8cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
 	\end{tikzpicture}
 \end{frame}
 
 \begin{frame}
+	\frametitle{Retorno de valores locais, da pilha, pode ?}
+	\begin{center}
+		\lstinputlisting[style=customc]{code/stack_ret_b.c}
+	\end{center}	
+	\pause
+	\begin{tikzpicture}[remember picture, overlay]
+		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
+		\node [xshift=-2cm,yshift=-6cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/nok.png}};
+		\node [xshift=-2cm,yshift=-8cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
+\end{tikzpicture}
+\end{frame}
+
+\begin{frame}
 	\frametitle{Passagem por valor x passagem por referência}
+	\begin{itemize}
+		\item Passagem por valor: o valor original é copiado e não pode ser alterado pela função
+		\item Passagem por referência: 
+		\begin{itemize}
+			\item O valor original não é copiado e pode ser alterado pela função. É utilizado um ponteiro para essa operação.
+			\item Também é interessante quando se passam estruturas muito grandes, economizando memória e processamento
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ponteiros}
+	\begin{itemize}
+		\item Um ponteiro armazena um valor e não um valor !
+		\item São referências indiretas para outras variáveis ou funções
+		\item São declarados com o emprego do asterisco \texttt{\textcolor{blue}{``*''}}
+		\item Endereços podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
+		\item Declaração básica de variável ponteiro:
+	\end{itemize}
+	\begin{verbatim}
+        <tipo_de_dado> *variavel;
+        uint8_t *pbuffer;
+        struct accel_s *paccel;
+	\end{verbatim}	
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ponteiros para variáveis simples}
+	\begin{columns}[T] % align columns
+	\begin{column}{.50\textwidth}
+		\lstinputlisting[style=customc]{code/ptr_a.c}
+	\end{column}%
+	\hfill%
+	\begin{column}{.50\textwidth}
+	 {\tiny 
+	\begin{verbatim}
+              Memory (32 bits)
+           +-------------------+
+0x20000000 |      var (10)     |<---+
+           +-------------------+    |
+0x20000004 |        ...        |    |
+           +-------------------+    |
+0x20000008 | pvar (0x20000000) |----+
+           +-------------------+
+0x2000000C |                   |
+           +-------------------+
+0x20000010 |                   |
+           +------------------+
+	\end{verbatim}
+}
+
+	\end{column}%
+\end{columns}	
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ponteiros para estruturas simples}
+	\begin{columns}[T] % align columns
+	\begin{column}{.75\textwidth}
+		\lstinputlisting[style=customc]{code/ptr_b.c}
+	\end{column}%
+	\hfill%
+	\begin{column}{.25\textwidth}
+	\end{column}%
+\end{columns}	
 \end{frame}
 
 \begin{frame}
@@ -375,8 +457,19 @@
 	\end{itemize}	
 \end{frame}
 
+\begin{frame}
+	\frametitle{}
+	\begin{columns}[T] % align columns
+		\begin{column}{.50\textwidth}
+		\end{column}%
+		\hfill%
+		\begin{column}{.50\textwidth}
+		\end{column}%
+	\end{columns}
+\end{frame}
 
 \end{document}
 
 
 % https://aticleworld.com/dangling-pointer-and-memory-leak/
+% const em ponteiros
