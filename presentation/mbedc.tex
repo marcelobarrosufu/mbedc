@@ -17,18 +17,18 @@
 
 \lstdefinestyle{CStyle}{
 	basicstyle=\ttfamily,
-	breakatwhitespace=false,         
-	breaklines=true,                 
-	captionpos=b,                    
-	keepspaces=true,                 
-	numbers=left,                    
-	numbersep=5pt,                  
-	showspaces=false,                
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
 	showstringspaces=false,
-	showtabs=false,                  
+	showtabs=false,
 	tabsize=2,
 	commentstyle=\color{OliveGreen},
-	keywordstyle=\color{CadetBlue}, 
+	keywordstyle=\color{CadetBlue},
 	language=C
 }
 
@@ -110,7 +110,7 @@
 	\item Não devem ser usadas como nomes de funções ou variáveis
 	\item São \textit{case sensitives}
 	\item Em azul, as adições do C11 em relação ao C99
-\end{itemize}	
+\end{itemize}
 
 	\fbox{
 	\begin{minipage}{10cm}
@@ -118,8 +118,8 @@
 		for goto if inline int long register restrict return short signed sizeof
 		static struct switch typedef union unsigned void volatile while
 		\_Bool \_Complex \_Imaginary}
-		
-		\texttt{\textcolor{blue}{\_Alignas \_Alignof \_Atomic  \_Generic 
+
+		\texttt{\textcolor{blue}{\_Alignas \_Alignof \_Atomic  \_Generic
 		\_Noreturn \_Static\_assert \_Thread\_local}}
 	\end{minipage}
 	}
@@ -128,9 +128,9 @@
 
 \begin{frame}
 	\frametitle{Estrutura de uma aplicação}
-	\begin{center}
+	%\begin{center}
 		\includegraphics[scale=0.6]{imgs/compile_process.png}
-	\end{center}	
+	%\end{center}
 \end{frame}
 
 \begin{frame}
@@ -143,16 +143,44 @@
 		\begin{column}{.40\textwidth}
 			\begin{itemize}
 				\item Pense como API: só exporte interfaces e o que elas precisarem !
-				\item Não esqueça a proteção de inclusão recursiva !				
+				\item Não esqueça a proteção de inclusão recursiva !
 				\item Não é ANSI-C mas \texttt{\textcolor{blue}{\#pragma once}} pode ser interessante
 				\item Evite incluir arquivos de inclusão como boa prática
+                \item E o \texttt{\textcolor{blue}{\_\_cplusplus}} e \texttt{\textcolor{blue}{extern ``C''}} ?
 			\end{itemize}
 		\end{column}%
 	\end{columns}
 \end{frame}
 
+\begin{frame}[fragile]
+	\frametitle{Name mangling ou name decoration}
+		\begin{itemize}
+			\item É uma forma de adicionar informações adicionais a nomes de funções, variáveis, etc, de forma a remover ambiguidade e gerar informação adicional ao linker\footnote{{\tiny\url{ https://stackoverflow.com/questions/41524956/gcc-c-name-mangling-reference}}}.
+			\item Por exemplo, como o compilador irá gerar nomes únicos para uma função com overloading em C++ ?
+            	\begin{lstlisting}[style=customc]
+void accel_read(float &x, float &y, float &x) {}
+void accel_read(accel_t &data) {};
+            	\end{lstlisting}
+               \item Nomes decorados gerados pelo GCC (objdump -d <binário>):
+            	\begin{lstlisting}[style=customc]
+0000000000001149 <_Z9accel_getRfS_S_>:
+0000000000001160 <_Z9accel_getR7accel_s>:
+            	\end{lstlisting}
+		\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Name mangling ou name decoration}
+		\begin{itemize}
+			\item Logo, se você linkar um programa em C com outras partes em C++, o compilador C++ irá gerar um padrão de name decoration para as suas funções em C que é diferente dos símbolos gerados pelo C !
+           \item A convenção de chamada padrão do C (\texttt{\textcolor{blue}{\_cdecl}})\footnote{\tiny{\url{https://en.wikipedia.org/wiki/Name_mangling}}} apenas adiciona ``\texttt{\textcolor{blue}{\_}}'' antes do nome das funções.
+           \item Assim, se declarar a função como \texttt{\textcolor{blue}{extern ``C'' void func(void);}} você está explicitando que a decoração segue o padrão do C.
+           \item O \texttt{\textcolor{blue}{\_\_cplusplus}} é a forma de identificar se o compilador é para C++ ou não.
+		\end{itemize}
+\end{frame}
+
 \begin{frame}
-	\frametitle{Arquivos de inclusão}
+	\frametitle{Arquivos de inclusão: modelo}
 	\lstinputlisting[style=customc]{code/accel.h}
 \end{frame}
 
@@ -166,8 +194,43 @@
 	\item Uma das características pouco entendidas da linguagem C e frequentemente mal empregadas.
 	\item Permitem detalhar a declaração de uma variável, com relação a linkagem, localização, escopo e valores iniciais.
 	\item É confuso pois o significado pode mudar de acordo com a posição no código fonte.
-	\item Mas, precisamos entender antes como as variáveis são armazenadas !
+	\item Mas, precisamos entender antes como as variáveis são armazenadas e as seções de código !
 	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Seções de código e dados do programa}
+    Quando o programa é compilador, ele é divido em \textbf{seções}:
+    \begin{description}
+    \item[text (flash):] Onde é armazenado o código executável de fato, geralmente em flash
+    \item[rodata (flash):] Constantes do código (read only)
+    \item[bss (RAM):] Local das variáveis que vão ser inicializadas com zero na partida (o usuário não fez uma inicialização de valor explícita)
+    \item[data (RAM):] Locas das variáveis que tiveram valores iniciais definidos pelo usuário.
+    \item[stack (RAM):] Parte da RAM usada para variável temporárias e passagem de parâmetros
+    \item[heap (RAM):] Parte da RAM usada para alocações dinâmicas
+    \end{description}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Exemplo de seções para um microcontrolador STM32F411}
+	\begin{columns}[T] % align columns
+	\begin{column}{.60\textwidth}
+	\begin{itemize}
+		\item Um arquivo de \textit{linkedição} (.ld) especifica as áreas de memória (flash e RAM) e como elas serão divididas para comportar as seções de text, bss, data, rodata, heap e stack.
+        \item Um código de inicialização (que roda antes do \texttt{main()}) é responsável por preparar o terreno:
+        	\begin{itemize}
+        		\item Zerar a seção bss
+                \item Inicializar a seção data
+                \item Inicializar o ponteiro da pilha
+                \item Inicializar o heap
+        	\end{itemize}
+	\end{itemize}
+	\end{column}%
+	\hfill%
+	\begin{column}{.40\textwidth}
+        \includegraphics[scale=0.35]{imgs/sections.png}
+	\end{column}%
+\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -176,7 +239,7 @@
 		\item Geralmente usado para alocação de variáveis temporárias ou passagem de parâmetros.
 		\item É uma região linear de memória, gerida por um registro denominado de \textit{Stack Pointer}.
 		\item O compilador analisa o código e gerar instruções para uso do stack.
-	\end{itemize}	
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -186,10 +249,19 @@
 		\lstinputlisting[style=customc]{code/stack.c}
 	\end{column}%
 	\hfill%
+    \pause
 	\begin{column}{.40\textwidth}
-		Análise:
+    {\footnotesize
+	\begin{itemize}
+	\item \texttt{global\_sum}: na seção data
+    \item \texttt{data}: temporariamente no stack
+    \item \texttt{sum}: temporariamente no stack
+    \item variáveis passadas na chamada da função \texttt{sum}: temporariamente no stack
+    \item retorno do valor da função \texttt{sum}:temporariamente  no stack
+	\end{itemize}
+    }
 	\end{column}%
-\end{columns}	
+\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -199,7 +271,7 @@
 	\item Recursão ou longo encadeamento de chamadas
 	\item Retorno de valores locais
 	\item Dimensionamento da pilha
-	\end{itemize}	
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -208,7 +280,7 @@
 	\item Escopo local (não visível fora da função)
 	\item Armazenamento em área global (não usa pilha)
 	\item Permite valores de inicialização.
-	\end{itemize}	
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -218,17 +290,23 @@
 			\lstinputlisting[style=customc]{code/static_var_fun.c}
 		\end{column}%
 		\hfill%
+        \pause
 		\begin{column}{.40\textwidth}
-			Análise:
+    {\footnotesize
+	\begin{itemize}
+	\item \texttt{initialized}: na seção de variáveis globais mas sem visibilidade fora de \texttt{drv\_init}, com valore inicial \texttt{false} e mantendo o valor entre chamadas da função
+    \item \texttt{data}: idem, não penalizando o stack
+	\end{itemize}
+    }
 		\end{column}%
-	\end{columns}	
+	\end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Retorno de valores locais, da pilha, pode ?}
 	\begin{center}
 	\lstinputlisting[style=customc]{code/stack_ret_a.c}
-	\end{center}	
+	\end{center}
 	\pause
 	\begin{tikzpicture}[remember picture, overlay]
 		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
@@ -241,7 +319,7 @@
 	\frametitle{Retorno de valores locais, da pilha, pode ?}
 	\begin{center}
 		\lstinputlisting[style=customc]{code/stack_ret_b.c}
-	\end{center}	
+	\end{center}
 	\pause
 	\begin{tikzpicture}[remember picture, overlay]
 		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
@@ -254,11 +332,12 @@
 	\frametitle{Passagem por valor x passagem por referência}
 	\begin{itemize}
 		\item Passagem por valor: o valor original é copiado e não pode ser alterado pela função
-		\item Passagem por referência: 
+		\item Passagem por referência:
 		\begin{itemize}
 			\item O valor original não é copiado e pode ser alterado pela função. É utilizado um ponteiro para essa operação.
 			\item Também é interessante quando se passam estruturas muito grandes, economizando memória e processamento
 		\end{itemize}
+       \item Mas antes é preciso falar um pouco sobre ponteiro !
 	\end{itemize}
 \end{frame}
 
@@ -275,7 +354,7 @@
         <tipo_de_dado> *variavel;
         uint8_t *pbuffer;
         struct accel_s *paccel;
-	\end{verbatim}	
+	\end{verbatim}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -286,7 +365,7 @@
 	\end{column}%
 	\hfill%
 	\begin{column}{.50\textwidth}
-	 {\tiny 
+	 {\tiny
 	\begin{verbatim}
               Memory (32 bits)
            +-------------------+
@@ -304,7 +383,7 @@
 }
 
 	\end{column}%
-\end{columns}	
+\end{columns}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -316,7 +395,7 @@
 	\hfill%
 	\begin{column}{.25\textwidth}
 	\end{column}%
-\end{columns}	
+\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -329,7 +408,7 @@
 			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ponteiros para função)
 		\end{itemize}
 		\item Análises dinâmicas: técnica da marca d'agua na região do stack (verificação dinâmica, útil em caso de recursão, interrupção)
-		\end{itemize}		
+		\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -371,7 +450,7 @@
 	\begin{columns}[T] % align columns
 		\begin{column}{.57\textwidth}
 			\lstinputlisting[style=customc]{code/static_linkage_b.c}
-			\lstinputlisting[style=customc]{code/static_linkage_a.c}			
+			\lstinputlisting[style=customc]{code/static_linkage_a.c}
 		\end{column}%
 		\hfill%
 		\begin{column}{.43\textwidth}
@@ -381,14 +460,14 @@
 			\item No entanto, mesmo que não especifique nada, o linker vai tentar encontrar algo na tabela de símbolos que resolva a referência.
 			\end{itemize}
 		\end{column}%
-	\end{columns}	
+	\end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Especificadores de classe de armazenamento (static/extern)}
 	\begin{columns}[T] % align columns
 		\begin{column}{.57\textwidth}
-			\lstinputlisting[style=customc]{code/static_linkage_e.c}			
+			\lstinputlisting[style=customc]{code/static_linkage_e.c}
 			\lstinputlisting[style=customc]{code/static_linkage_d.c}
 			\lstinputlisting[style=customc]{code/static_linkage_c.c}
 		\end{column}%
@@ -400,7 +479,7 @@
 				\item Princípio de encapsulamento ou API.
 			\end{itemize}
 		\end{column}%
-	\end{columns}	
+	\end{columns}
 \end{frame}
 
 \begin{frame}
@@ -445,7 +524,7 @@
 		#include <stdio.h>
 		int main(void)
 		{
-			printf("Hello World!"); 
+			printf("Hello World!");
 		}
 	\end{lstlisting}
 \end{frame}
@@ -454,7 +533,7 @@
 	\frametitle{Palavras Reservadas}
 	\begin{itemize}
 		\item x
-	\end{itemize}	
+	\end{itemize}
 \end{frame}
 
 \begin{frame}
