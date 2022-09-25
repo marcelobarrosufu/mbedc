@@ -337,17 +337,17 @@ void accel_read(accel_t &data) {};
 			\item O valor original não é copiado e pode ser alterado pela função. É utilizado um ponteiro para essa operação.
 			\item Também é interessante quando se passam estruturas muito grandes, economizando memória e processamento
 		\end{itemize}
-       \item Mas antes é preciso falar um pouco sobre ponteiro !
+       \item Mas antes é preciso falar um pouco sobre ponteiros !
 	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Ponteiros}
 	\begin{itemize}
-		\item Um ponteiro armazena um valor e não um valor !
+		\item Um ponteiro armazena endereço de memória e não um valor !
 		\item São referências indiretas para outras variáveis ou funções
 		\item São declarados com o emprego do asterisco \texttt{\textcolor{blue}{``*''}}
-		\item Endereços podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
+		\item Endereços de variáveis podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
 		\item Declaração básica de variável ponteiro:
 	\end{itemize}
 	\begin{verbatim}
@@ -356,7 +356,9 @@ void accel_read(accel_t &data) {};
         struct accel_s *paccel;
 	\end{verbatim}
 \end{frame}
-
+%
+% endereço de função e endereço de array
+%
 \begin{frame}[fragile]
 	\frametitle{Ponteiros para variáveis simples}
 	\begin{columns}[T] % align columns
@@ -396,6 +398,14 @@ void accel_read(accel_t &data) {};
 	\begin{column}{.25\textwidth}
 	\end{column}%
 \end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Ponteiros e vetores}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Ponteiros para função}
 \end{frame}
 
 \begin{frame}
