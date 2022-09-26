@@ -9,6 +9,7 @@
 \usepackage{courier}
 \usepackage{tikz}
 \usepackage{verbatim}
+\usepackage{cancel}
 
 \definecolor{lightlightgray}{gray}{0.9}
 \definecolor{OliveGreen}{cmyk}{0.64,0,0.95,0.40}
@@ -70,7 +71,7 @@
 \section{Fundamentos}
 
 \begin{frame}
-	\frametitle{Definições}
+	\frametitle{Versões utilizadas}
 	\begin{itemize}
 		\item Revisão C11 (ISO/IEC 9899:2011)
 		\item Compilador GNU GCC
@@ -79,15 +80,15 @@
 
 \begin{frame}
 	\frametitle{Linha do tempo da linguagem C}
-	\begin{itemize}
-		\item B (1972): Primeira implementação, Dennis Ritchie and Ken Thompson e colegas para o PDP11.
-		\item K\&R (1978): Primeira especificação informal.
-		\item C89/C90 (1989/1990): Adoção como padrão pela ANSI (C89) e depois pela ISO (C90).
-		\item C99 (1999): Primeira grande revisão do padrão, amplamente utilizada.
-		\item C11 (2011): Segunda revisão da linguagem. Aproximação ao C++. Ainda em uso moderado.
-		\item C17 (2018): Sem características novas. Apenas correções.
-		\item C2x (2023?)\footnote{\url{https://en.wikipedia.org/wiki/C2x}}
-	\end{itemize}
+	\begin{description}
+		\item[ B (1972):] Primeira implementação, Dennis Ritchie and Ken Thompson e colegas para o PDP11.
+		\item [K\&R (1978):] Primeira especificação informal.
+		\item [C89/C90 (1989/1990):] Adoção como padrão pela ANSI (C89) e depois pela ISO (C90).
+		\item [C99 (1999):] Primeira grande revisão do padrão, amplamente utilizada.
+		\item [C11 (2011):] Segunda revisão da linguagem. Aproximação ao C++. Uso moderado mas crescendo.
+		\item [C17 (2018):] Sem características novas. Apenas correções.
+		\item [C2x (2023?)]\footnote{\url{https://en.wikipedia.org/wiki/C2x}}
+	\end{description}
 \end{frame}
 
 \begin{frame}
@@ -127,14 +128,14 @@
 
 
 \begin{frame}
-	\frametitle{Estrutura de uma aplicação}
+	\frametitle{Estrutura e organização de uma aplicação}
 	%\begin{center}
 		\includegraphics[scale=0.6]{imgs/compile_process.png}
 	%\end{center}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Arquivos de inclusão}
+	\frametitle{Organização dos arquivos de inclusão}
 	\begin{columns}[T] % align columns
 		\begin{column}{.60\textwidth}
 			\lstinputlisting[style=customc]{code/demo.h}
@@ -145,7 +146,7 @@
 				\item Pense como API: só exporte interfaces e o que elas precisarem !
 				\item Não esqueça a proteção de inclusão recursiva !
 				\item Não é ANSI-C mas \texttt{\textcolor{blue}{\#pragma once}} pode ser interessante
-				\item Evite incluir arquivos de inclusão como boa prática
+				\item Evite colocar arquivos de inclusão em .h (boa prática)
                 \item E o \texttt{\textcolor{blue}{\_\_cplusplus}} e \texttt{\textcolor{blue}{extern ``C''}} ?
 			\end{itemize}
 		\end{column}%
@@ -163,8 +164,8 @@ void accel_read(accel_t &data) {};
             	\end{lstlisting}
                \item Nomes decorados gerados pelo GCC (objdump -d <binário>):
             	\begin{lstlisting}[style=customc]
-0000000000001149 <_Z9accel_getRfS_S_>:
-0000000000001160 <_Z9accel_getR7accel_s>:
+0000000000001149 <_Z9accel_readRfS_S_>:
+0000000000001160 <_Z9accel_readR7accel_s>:
             	\end{lstlisting}
 		\end{itemize}
 \end{frame}
@@ -174,9 +175,24 @@ void accel_read(accel_t &data) {};
 		\begin{itemize}
 			\item Logo, se você linkar um programa em C com outras partes em C++, o compilador C++ irá gerar um padrão de name decoration para as suas funções em C que é diferente dos símbolos gerados pelo C !
            \item A convenção de chamada padrão do C (\texttt{\textcolor{blue}{\_cdecl}})\footnote{\tiny{\url{https://en.wikipedia.org/wiki/Name_mangling}}} apenas adiciona ``\texttt{\textcolor{blue}{\_}}'' antes do nome das funções.
-           \item Assim, se declarar a função como \texttt{\textcolor{blue}{extern ``C'' void func(void);}} você está explicitando que a decoração segue o padrão do C.
-           \item O \texttt{\textcolor{blue}{\_\_cplusplus}} é a forma de identificar se o compilador é para C++ ou não.
+           \item Assim, se declarar a função como \texttt{\textcolor{blue}{extern ``C'' void func(void);}} você está explicitando que a decoração de \texttt{\textcolor{blue}{func}} segue o padrão do C (\texttt{\textcolor{blue}{\_func}}).
+           \item O \texttt{\textcolor{blue}{\_\_cplusplus}} é a forma de identificar se quem está compilando o arquivo é o compilador C ou C++.
 		\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{E o extern ?}
+	\begin{description}
+	\item [Para variáveis:] diz para o compilador que a variável citada existe em algum lugar, não aloca memória para ela. O linker vai cuidar de ``encontrar'' onde a declaração foi feita.
+	\begin{verbatim}
+extern uint8_t buffer[16];
+	\end{verbatim}
+	\item [Para funções:]	explicita que a função tem linkagem externa, ou seja, o linker vai deixá-la disponível para ser ``encontrada'' por qualquer arquivo C. Esse é o default da linguagem. É o inverso do ``static''.
+	\end{description}
+		\vspace*{0.5cm}
+		\begin{center}
+		Atenção: \texttt{\textcolor{blue}{extern ``C'' <nome>}} é um dialeto C++ !
+	\end{center}	
 \end{frame}
 
 \begin{frame}
@@ -187,14 +203,12 @@ void accel_read(accel_t &data) {};
 \begin{frame}
 	\frametitle{Especificadores de classe de armazenamento}
 	\begin{center}
-		\texttt{\textcolor{blue}{static extern auto register}}
+		\texttt{\textcolor{blue}{\cancel{extern} static auto register}}
 	\end{center}
-	\begin{itemize}
 		\vspace*{0.5cm}
-	\item Uma das características pouco entendidas da linguagem C e frequentemente mal empregadas.
-	\item Permitem detalhar a declaração de uma variável, com relação a linkagem, localização, escopo e valores iniciais.
-	\item É confuso pois o significado pode mudar de acordo com a posição no código fonte.
-	\item Mas, precisamos entender antes como as variáveis são armazenadas e as seções de código !
+	\begin{itemize}
+	\item Existem outros especificadores !
+	\item No entanto, precisamos entender antes como as variáveis são armazenadas e as seções de código !
 	\end{itemize}
 \end{frame}
 
@@ -275,11 +289,18 @@ void accel_read(accel_t &data) {};
 \end{frame}
 
 \begin{frame}
-	\frametitle{Uso de static em variáveis locais}
+	\frametitle{Especificadores de classe de armazenamento}
+		Uso de static em variáveis e funções:
+	\vspace*{0.5cm}
 	\begin{itemize}
-	\item Escopo local (não visível fora da função)
-	\item Armazenamento em área global (não usa pilha)
-	\item Permite valores de inicialização.
+	\item static em variáveis locais:
+		\begin{itemize}
+		\item Escopo local (não visível fora da função)
+		\item Armazenamento em área global (não usa pilha)
+		\item Permite valores de inicialização.
+		\end{itemize}
+	\item static em variáveis globais: linkagem interna para a variável (não ``visível'' por outros arquivos).  Isso permite, por exemplo, ter \textit{nomes de variáveis iguais em arquivos diferentes}.
+	\item static em funções: linkagem interna para a função, similar a variáveis.
 	\end{itemize}
 \end{frame}
 
