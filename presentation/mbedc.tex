@@ -377,9 +377,7 @@ extern uint8_t buffer[16];
         struct accel_s *paccel;
 	\end{verbatim}
 \end{frame}
-%
-% endereço de função e endereço de array
-%
+
 \begin{frame}[fragile]
 	\frametitle{Ponteiros para variáveis simples}
 	\begin{columns}[T] % align columns
@@ -404,7 +402,6 @@ extern uint8_t buffer[16];
            +------------------+
 	\end{verbatim}
 }
-
 	\end{column}%
 \end{columns}
 \end{frame}
@@ -421,12 +418,115 @@ extern uint8_t buffer[16];
 \end{columns}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 	\frametitle{Ponteiros e vetores}
+		\lstinputlisting[style=customc]{code/ptr_c.c}
+	 {\normalsize 
+	 	\begin{verbatim}
+V     = 0x55D2EBB8F020
+&V    = 0x55D2EBB8F020
+&V[0] = 0x55D2EBB8F020
+&V[1] = 0x55D2EBB8F024
+&V[2] = 0x55D2EBB8F028
+&V[2] = 0x55D2EBB8F02C
+	\end{verbatim}
+	}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Ponteiros e arrays de caracteres}
+		\lstinputlisting[style=customc]{code/ptr_e.c}
+	 {\scriptsize   
+	 	\begin{verbatim}
+STR1 = 0x7FFE326EC8E5   <== stack
+STR2 = 0x5585446ED004   <== global
+STR3 = 0x7FFE326EC8D0   <== stack
+STR1    ab,2
+STR2    ab,2
+STR3[0] ab,2
+STR3[1] 12,2
+	\end{verbatim}
+	}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Aritmética de ponteiros}
+	\textbf{Regra básica}: ao incrementar/decrementar um ponteiro, o valor adicionado/subtraído é igual ao tamanho do tipo de dado para o qual ele aponta.
+	\lstinputlisting[style=customc]{code/ptr_d.c}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Aritmética de ponteiros}
+	\begin{columns}[T] % align columns
+	\begin{column}{.4\textwidth}
+	 {\footnotesize 
+	\begin{verbatim}
+	
+	
+	
+	
+SIZE    = 8
+TRANS   = 0x7FFD8F7F0DA0
+PTRANS  = 0x7FFD8F7F0DA0
+&PTRANS = 0x7FFD8F7F0D98
+TRAN[0] = 0x7FFD8F7F0DA0
+TRAN[1] = 0x7FFD8F7F0DA8
+	\end{verbatim}
+}
+	\end{column}%
+	\hfill%
+	\begin{column}{.6\textwidth}
+	 {\scriptsize 
+	\begin{verbatim}
+                 Memory (64 bits)
+               +-------------------+
+0x7FFD8F7F0D98 |  0x7FFD8F7F0DA0   |---+
+               +-------------------+   |
+               |        ...        |   |
+               +-------------------+   |
+0x7FFD8F7F0DA0 |      TRANS[0]     |<--+
+               +-------------------+
+0x7FFD8F7F0DA8 |      TRANS[1]     |
+               +-------------------+
+0x7FFD8F7F0DB0 |      TRANS[2]     |
+               +-------------------+
+0x7FFD8F7F0DB8 |      TRANS[3]     |
+               +-------------------+
+	\end{verbatim}
+}
+	\end{column}%
+\end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Ponteiros para função}
+	\begin{itemize}
+		\item O nome da função é um sempre um ponteiro ! 
+		\item O grande problema é a notação, que é confusa !
+	\end{itemize}
+	\lstinputlisting[style=customc]{code/ptr_fun_a.c}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Ponteiros para função}
+	\begin{itemize}
+		\item Mas não precisa ser assim ! 
+		\item Acompanhe como criar um ponteiro pra função e como o programa se transforma depois disso.
+	\end{itemize}	
+	\vspace*{0.5cm}
+\texttt{int64\_t sum(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t sum(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(}}sum\texttt{\textcolor{blue}{)}}(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(sum\_t)}}(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(*sum\_t)}}(int32\_t a, int32\_t b);} 
+\end{frame}
+
+\begin{frame}
+	\frametitle{Ponteiros para função}
+	\begin{itemize}
+		\item Bem mais legível:
+	\end{itemize}
+	\lstinputlisting[style=customc]{code/ptr_fun_b.c}	
 \end{frame}
 
 \begin{frame}
@@ -544,7 +644,7 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Arquivos de código fonte}
+	\frametitle{Arquivos de código fonte (modelo)}
 	\lstinputlisting[style=customc]{code/accel.c}
 \end{frame}
 
@@ -561,19 +661,78 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Palavras Reservadas}
+	\frametitle{Estruturas de dados}
+	\begin{quote}
+		I’m a huge proponent of designing your code around the data, rather than the other way around, and I think it’s one of the reasons git has been fairly successful… I will, in fact, claim that the difference between a bad programmer and a good one is whether he considers his code or his data structures more important. Bad programmers worry about the code. Good programmers worry about data structures and their relationships.
+	\end{quote}
+	\begin{flushright}
+	Linus Torvalds
+	\end{flushright}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Estruturas, enumerações e uniões}
 	\begin{itemize}
-		\item x
+	\item Ajudam a organizar os dados, evitando variáveis espalhadas.
+	\item Melhoram a visualização e entendimento do código (legibilidade e manutenção).
+	\item Reduzem complexidade, sem bem usadas.
+	\item \texttt{\textcolor{blue}{typedef}} pode ajudar !
 	\end{itemize}
+	\begin{columns}[T] % align columns
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+struct coord_s
+{
+	uint32_t xa;
+	uint32_t ya;
+	uint32_t xb;
+	uint32_t yb;			
+};
+
+struct coord_s pos = { 0 };
+void func(struct coord_s *pos);
+	\end{lstlisting}
+		\end{column}%
+		\hfill%
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+typedef struct coord_s
+{
+	uint32_t xa;
+	uint32_t ya;
+	uint32_t xb;
+	uint32_t yb;			
+} coord_t;
+
+coord_t pos = { 0 };
+void func(coord_t *pos);
+	\end{lstlisting}				
+		\end{column}%
+	\end{columns}
 \end{frame}
 
 \begin{frame}
-	\frametitle{}
+	\frametitle{Exemplo completo}
 	\begin{columns}[T] % align columns
-		\begin{column}{.50\textwidth}
-		\end{column}%
+		\begin{column}{.5\textwidth}
+		\lstinputlisting[style=customc]{code/struct_a.c}
+			\end{column}%
 		\hfill%
-		\begin{column}{.50\textwidth}
+		\begin{column}{.5\textwidth}
+		\lstinputlisting[style=customc]{code/struct_b.c}		
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Exemplo completo}
+	\begin{columns}[T] % align columns
+		\begin{column}{.5\textwidth}
+		\lstinputlisting[style=customc]{code/struct_c.c}
+			\end{column}%
+		\hfill%
+		\begin{column}{.5\textwidth}
+		\lstinputlisting[style=customc]{code/struct_d.c}		
 		\end{column}%
 	\end{columns}
 \end{frame}
