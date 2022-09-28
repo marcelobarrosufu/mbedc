@@ -6,7 +6,7 @@
 
 static bool started = false;
 
-static void accel_init_drv(void)
+static void accel_drv_init(void)
 {
 }
 
@@ -18,7 +18,7 @@ void accel_init(void)
 {
 	if(!started)
 	{
-		accel_init_drv();
+		accel_drv_init();
 		started = true;
 	}
 }

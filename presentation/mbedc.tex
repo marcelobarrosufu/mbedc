@@ -41,7 +41,8 @@
 	xleftmargin=\parindent,
 	language=C,
 	showstringspaces=false,
-	basicstyle=\scriptsize\ttfamily,
+	%basicstyle=\scriptsize\ttfamily,
+    basicstyle=\tiny\ttfamily,
 	keywordstyle=\bfseries\color{green!40!black},
 	commentstyle=\itshape\color{purple!40!black},
 	identifierstyle=\color{blue},
@@ -112,9 +113,10 @@
 	\item São \textit{case sensitives}
 	\item Em azul, as adições do C11 em relação ao C99
 \end{itemize}
-
+\vspace*{0.5cm}
 	\fbox{
 	\begin{minipage}{10cm}
+    {\small
 		\texttt{auto break case char const continue default do double else enum extern float
 		for goto if inline int long register restrict return short signed sizeof
 		static struct switch typedef union unsigned void volatile while
@@ -122,6 +124,7 @@
 
 		\texttt{\textcolor{blue}{\_Alignas \_Alignof \_Atomic  \_Generic
 		\_Noreturn \_Static\_assert \_Thread\_local}}
+        }
 	\end{minipage}
 	}
 \end{frame}
@@ -192,7 +195,7 @@ extern uint8_t buffer[16];
 		\vspace*{0.5cm}
 		\begin{center}
 		Atenção: \texttt{\textcolor{blue}{extern ``C'' <nome>}} é um dialeto C++ !
-	\end{center}	
+	\end{center}
 \end{frame}
 
 \begin{frame}
@@ -203,7 +206,7 @@ extern uint8_t buffer[16];
 \begin{frame}
 	\frametitle{Especificadores de classe de armazenamento}
 	\begin{center}
-		\texttt{\textcolor{blue}{\cancel{extern} static auto register}}
+		\texttt{\textcolor{blue}{extern static auto register}}
 	\end{center}
 		\vspace*{0.5cm}
 	\begin{itemize}
@@ -331,8 +334,8 @@ extern uint8_t buffer[16];
 	\pause
 	\begin{tikzpicture}[remember picture, overlay]
 		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
-		\node [xshift=-2cm,yshift=-6cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
-		\node [xshift=-2cm,yshift=-8cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
+		\node [xshift=-2cm,yshift=-5.5cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
+		\node [xshift=-2cm,yshift=-7cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
 	\end{tikzpicture}
 \end{frame}
 
@@ -344,22 +347,39 @@ extern uint8_t buffer[16];
 	\pause
 	\begin{tikzpicture}[remember picture, overlay]
 		\node [xshift=-2cm,yshift=-4cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/maybe.png}};
-		\node [xshift=-2cm,yshift=-6cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/nok.png}};
-		\node [xshift=-2cm,yshift=-8cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
+		\node [xshift=-2cm,yshift=-5.5cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/nok.png}};
+		\node [xshift=-2cm,yshift=-7cm] at (current page.north east)	{\includegraphics[scale=0.6]{imgs/ok.png}};
 \end{tikzpicture}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[fragile]
 	\frametitle{Passagem por valor x passagem por referência}
 	\begin{itemize}
 		\item Passagem por valor: o valor original é copiado e não pode ser alterado pela função
 		\item Passagem por referência:
 		\begin{itemize}
-			\item O valor original não é copiado e pode ser alterado pela função. É utilizado um ponteiro para essa operação.
+			\item O valor original não é copiado e pode ser alterado pela função.
+            \item É utilizado um ponteiro para essa operação, ou seja, deve ser passada o endereço do dado (referência) e não o seu valor.
 			\item Também é interessante quando se passam estruturas muito grandes, economizando memória e processamento
 		\end{itemize}
-       \item Mas antes é preciso falar um pouco sobre ponteiros !
 	\end{itemize}
+    {\tiny
+	\begin{lstlisting}[style=customc]
+    // passagem por valor
+    void func1(uint32_t v){ v = v + 5; }
+    // passagem por referencia
+    void func2(uint32_t *v){ *v = *v + 5; }
+
+    int main(void)
+    {
+      uint32_t v = 10;
+      func1(v); // v nao sera alterado
+      func2(&v); // v sera alterado (15)
+      return 0;
+    }
+	\end{lstlisting}
+    }
+%    É preciso falar um pouco mais sobre ponteiros !
 \end{frame}
 
 \begin{frame}[fragile]
@@ -371,11 +391,13 @@ extern uint8_t buffer[16];
 		\item Endereços de variáveis podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
 		\item Declaração básica de variável ponteiro:
 	\end{itemize}
+    {\footnotesize
 	\begin{verbatim}
         <tipo_de_dado> *variavel;
         uint8_t *pbuffer;
         struct accel_s *paccel;
 	\end{verbatim}
+    }
 \end{frame}
 
 \begin{frame}[fragile]
@@ -421,7 +443,7 @@ extern uint8_t buffer[16];
 \begin{frame}[fragile]
 	\frametitle{Ponteiros e vetores}
 		\lstinputlisting[style=customc]{code/ptr_c.c}
-	 {\normalsize 
+	 {\scriptsize
 	 	\begin{verbatim}
 V     = 0x55D2EBB8F020
 &V    = 0x55D2EBB8F020
@@ -436,7 +458,7 @@ V     = 0x55D2EBB8F020
 \begin{frame}[fragile]
 	\frametitle{Ponteiros e arrays de caracteres}
 		\lstinputlisting[style=customc]{code/ptr_e.c}
-	 {\scriptsize   
+	 {\scriptsize
 	 	\begin{verbatim}
 STR1 = 0x7FFE326EC8E5   <== stack
 STR2 = 0x5585446ED004   <== global
@@ -459,12 +481,12 @@ STR3[1] 12,2
 	\frametitle{Aritmética de ponteiros}
 	\begin{columns}[T] % align columns
 	\begin{column}{.4\textwidth}
-	 {\footnotesize 
+	 {\footnotesize
 	\begin{verbatim}
-	
-	
-	
-	
+
+
+
+
 SIZE    = 8
 TRANS   = 0x7FFD8F7F0DA0
 PTRANS  = 0x7FFD8F7F0DA0
@@ -476,7 +498,7 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\end{column}%
 	\hfill%
 	\begin{column}{.6\textwidth}
-	 {\scriptsize 
+	 {\scriptsize
 	\begin{verbatim}
                  Memory (64 bits)
                +-------------------+
@@ -501,24 +523,28 @@ TRAN[1] = 0x7FFD8F7F0DA8
 \begin{frame}
 	\frametitle{Ponteiros para função}
 	\begin{itemize}
-		\item O nome da função é um sempre um ponteiro ! 
+		\item O nome da função é um sempre um ponteiro !
 		\item O grande problema é a notação, que é confusa !
 	\end{itemize}
-	\lstinputlisting[style=customc]{code/ptr_fun_a.c}	
+	\lstinputlisting[style=customc]{code/ptr_fun_a.c}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Ponteiros para função}
 	\begin{itemize}
-		\item Mas não precisa ser assim ! 
+		\item Mas não precisa ser assim !
 		\item Acompanhe como criar um ponteiro pra função e como o programa se transforma depois disso.
-	\end{itemize}	
+	\end{itemize}
 	\vspace*{0.5cm}
+    {\scriptsize
 \texttt{int64\_t sum(int32\_t a, int32\_t b);} \\
-\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t sum(int32\_t a, int32\_t b);} \\
-\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(}}sum\texttt{\textcolor{blue}{)}}(int32\_t a, int32\_t b);} \\
-\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(sum\_t)}}(int32\_t a, int32\_t b);} \\
-\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(*sum\_t)}}(int32\_t a, int32\_t b);} 
+\texttt{\textcolor{blue}{\textbf{typedef}}} \texttt{int64\_t sum(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{\textbf{(}}}sum\texttt{\textcolor{blue}{\textbf{)}}}(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(\textbf{sum\_t})}}(int32\_t a, int32\_t b);} \\
+\texttt{\textcolor{blue}{typedef}} \texttt{int64\_t \texttt{\textcolor{blue}{(\textbf{*}sum\_t)}}(int32\_t a, int32\_t b);} \\
+\vspace*{0.5cm}
+\texttt{typedef <retorno> (*nome\_do\_tipo)(lista,de,parâmetros);}
+}
 \end{frame}
 
 \begin{frame}
@@ -526,7 +552,7 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\begin{itemize}
 		\item Bem mais legível:
 	\end{itemize}
-	\lstinputlisting[style=customc]{code/ptr_fun_b.c}	
+	\lstinputlisting[style=customc]{code/ptr_fun_b.c}
 \end{frame}
 
 \begin{frame}
@@ -627,7 +653,52 @@ TRAN[1] = 0x7FFD8F7F0DA8
 \end{frame}
 
 \begin{frame}
-	\frametitle{Arquivos de código fonte}
+	\frametitle{Qualificadores}
+	\begin{center}
+		\texttt{\textcolor{blue}{const volatile}}
+	\end{center}
+		\vspace*{0.5cm}
+	\begin{description}
+	\item [const:] indica que a variável é constante, ou seja, que seu valor não muda durante a execução. O compilador pode usar essa informação para colocar essa variável em flash e encontrar erros em tempo de compilação.
+	\item [volatile:] indica que o valor da variável pode ser alterado por outros elementos além do fluxo de programa principal em execução. Exemplos:
+    {\footnotesize
+    \begin{itemize}
+    \item Uma variável global compartilhada entre duas tarefas ou entre o programa principal e uma interrupção associadas a uma opção de compilação com maior nível de otimização.
+    \item Uma variável que aponta para um registro do processador, ou seja, que pode ter o valor modificado pelo próprio hardware.
+    \end{itemize}
+    }
+	\end{description}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Qualificadores e ponteiros}
+    Usar adequadamente o qualificador \texttt{const} com ponteiros é, frequentemente, uma boa prática:
+		\vspace*{0.5cm}
+	\begin{lstlisting}[style=customc]
+void lcd_write(const uint8_t *data)
+{
+  // o dado apontado deve ser constante,
+  // a linha abaixo gera um erro de compilacao
+  data[0] = 1; // error: assignment of read-only location
+}
+
+void lcd_write(uint8_t *const data)
+{
+  // o ponteiro dever ser constante,
+  // a linha abaixo gera um erro de compilacao
+  data++; // error: increment of read-only parameter
+}
+
+void lcd_write(const uint8_t *const data)
+{
+  // o ponteiro dever ser constante,
+  // assim como o dado apontado por ele !
+}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de código fonte (modelo)}
 	\begin{columns}[T] % align columns
 		\begin{column}{.60\textwidth}
 			\lstinputlisting[style=customc]{code/demo.c}
@@ -648,34 +719,12 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\lstinputlisting[style=customc]{code/accel.c}
 \end{frame}
 
-
 \begin{frame}[fragile]
-	\begin{lstlisting}[style=customc]
-		// test
-		#include <stdio.h>
-		int main(void)
-		{
-			printf("Hello World!");
-		}
-	\end{lstlisting}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Estruturas de dados}
-	\begin{quote}
-		I’m a huge proponent of designing your code around the data, rather than the other way around, and I think it’s one of the reasons git has been fairly successful… I will, in fact, claim that the difference between a bad programmer and a good one is whether he considers his code or his data structures more important. Bad programmers worry about the code. Good programmers worry about data structures and their relationships.
-	\end{quote}
-	\begin{flushright}
-	Linus Torvalds
-	\end{flushright}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Estruturas, enumerações e uniões}
+	\frametitle{Estruturas}
 	\begin{itemize}
 	\item Ajudam a organizar os dados, evitando variáveis espalhadas.
 	\item Melhoram a visualização e entendimento do código (legibilidade e manutenção).
-	\item Reduzem complexidade, sem bem usadas.
+	\item Reduzem complexidade, se bem usadas.
 	\item \texttt{\textcolor{blue}{typedef}} pode ajudar !
 	\end{itemize}
 	\begin{columns}[T] % align columns
@@ -683,14 +732,18 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\begin{lstlisting}[style=customc]
 struct coord_s
 {
-	uint32_t xa;
-	uint32_t ya;
-	uint32_t xb;
-	uint32_t yb;			
+	uint32_t x;
+	uint32_t y;
 };
 
-struct coord_s pos = { 0 };
-void func(struct coord_s *pos);
+struct rect_s
+{
+  struct coord_s c1;
+  struct coord_s c2;
+};
+
+struct rect_s rect = { 0 };
+void func(struct rect_s *rect);
 	\end{lstlisting}
 		\end{column}%
 		\hfill%
@@ -698,48 +751,138 @@ void func(struct coord_s *pos);
 	\begin{lstlisting}[style=customc]
 typedef struct coord_s
 {
-	uint32_t xa;
-	uint32_t ya;
-	uint32_t xb;
-	uint32_t yb;			
+	uint32_t x;
+	uint32_t y;
 } coord_t;
 
-coord_t pos = { 0 };
-void func(coord_t *pos);
-	\end{lstlisting}				
+typedef struct rect_s
+{
+  coord_t c1;
+  coord_t c2;
+} rect_t;
+
+rect_t rect = { 0 };
+void func(rect_t *rect);
+	\end{lstlisting}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Enumerações}
+	\begin{itemize}
+	\item Permitem organizar definições relacionadas.
+	\item Pode ajudar na detecção de erros (valores inválidos).
+	\item Reduzem complexidade, melhoram a legibilidade.
+	\item Obedecem regras de escopo, algo que não é possível com defines.
+	\end{itemize}
+	\begin{columns}[T] % align columns
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+#define RTC_WEEKDAY_SUN 0
+#define RTC_WEEKDAY_MON 1
+#define RTC_WEEKDAY_TUE 2
+#define RTC_WEEKDAY_WED 3
+#define RTC_WEEKDAY_THU 4
+#define RTC_WEEKDAY_FRI 5
+#define RTC_WEEKDAY_SAT 6
+
+void rtc_wday_set(uint8_t wday)
+{
+}
+	\end{lstlisting}
+		\end{column}%
+		\hfill%
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+typedef enum rtc_wday_e
+{
+  RTC_WEEKDAY_SUN = 0,
+  RTC_WEEKDAY_MON = 1,
+  RTC_WEEKDAY_TUE = 2,
+  RTC_WEEKDAY_WED = 3,
+  RTC_WEEKDAY_THU = 4,
+  RTC_WEEKDAY_FRI = 5,
+  RTC_WEEKDAY_SAT = 6,
+} rtc_wday_t;
+
+void rtc_wday_set(rtc_wday_t wday)
+{
+}
+	\end{lstlisting}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Uniões}
+	\begin{itemize}
+	\item Enquanto as estruturas dispõem sequencialmente os seus membros na memória, as uniões os armazenam na mesma posição.
+	\item Isso permite ``visualizar'' a mesma área de memória com diferentes lentes.
+	\item Em geral, muito útil em generalizações, evitando duplicações de memória.
+	\end{itemize}
+	\begin{columns}[T] % align columns
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+typedef union kved_value_u
+{
+  uint8_t u8;
+  uint16_t u16;
+  uint32_t u32;
+} kved_value_t;
+
+typedef struct kved_data_s
+{
+  kved_value_t value;
+  bool updated;
+} kved_data_t;
+	\end{lstlisting}
+		\end{column}%
+		\hfill%
+		\begin{column}{.5\textwidth}
+        {\tiny
+	\begin{verbatim}
+              Memory (32 bits)
+           [________u32________] <- value.u32
+           [___u16___]           <- value.u16
+           [_u8]                 <- value.u8
+           +---------+---------+
+0x20000000 |    |    |    |    |
+           +---------+---------+
+0x20000004 |                   |
+           +-------------------+
+0x20000008 |        ...        |
+           +-------------------+
+	\end{verbatim}
+    }
 		\end{column}%
 	\end{columns}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Exemplo completo}
+	\frametitle{Exemplo completo (1/2)}
 	\begin{columns}[T] % align columns
 		\begin{column}{.5\textwidth}
 		\lstinputlisting[style=customc]{code/struct_a.c}
 			\end{column}%
 		\hfill%
 		\begin{column}{.5\textwidth}
-		\lstinputlisting[style=customc]{code/struct_b.c}		
+		\lstinputlisting[style=customc]{code/struct_b.c}
 		\end{column}%
 	\end{columns}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Exemplo completo}
+	\frametitle{Exemplo completo (2/2)}
 	\begin{columns}[T] % align columns
 		\begin{column}{.5\textwidth}
 		\lstinputlisting[style=customc]{code/struct_c.c}
 			\end{column}%
 		\hfill%
 		\begin{column}{.5\textwidth}
-		\lstinputlisting[style=customc]{code/struct_d.c}		
+		\lstinputlisting[style=customc]{code/struct_d.c}
 		\end{column}%
 	\end{columns}
 \end{frame}
 
 \end{document}
-
-
-% https://aticleworld.com/dangling-pointer-and-memory-leak/
-% const em ponteiros
-% estrutura x união
