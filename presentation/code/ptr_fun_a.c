@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <inttypes.h>
+
 int64_t sum(int32_t a, int32_t b)
 {
     return a + b;
 }
+
 int main (void)
 {
   printf("%lu\n",sum(10,20)); // 30

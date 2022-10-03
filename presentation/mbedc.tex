@@ -65,17 +65,17 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Outline}
+\frametitle{Sumário}
 \tableofcontents
 \end{frame}
 
-\section{Fundamentos}
-
+\section{Introdução}
+	
 \begin{frame}
 	\frametitle{Versões utilizadas}
 	\begin{itemize}
-		\item Revisão C11 (ISO/IEC 9899:2011)
-		\item Compilador GNU GCC
+		\item Versão C11 (ISO/IEC 9899:2011)
+		\item Compilador GNU GCC\footnote{\url{https://www.onlinegdb.com/online_c_compiler}}
 	\end{itemize}
 \end{frame}
 
@@ -86,23 +86,25 @@
 		\item [K\&R (1978):] Primeira especificação informal.
 		\item [C89/C90 (1989/1990):] Adoção como padrão pela ANSI (C89) e depois pela ISO (C90).
 		\item [C99 (1999):] Primeira grande revisão do padrão, amplamente utilizada.
-		\item [C11 (2011):] Segunda revisão da linguagem. Aproximação ao C++. Uso moderado mas crescendo.
+		\item [C11 (2011):] Segunda revisão da linguagem. Aproximação ao C++. 
 		\item [C17 (2018):] Sem características novas. Apenas correções.
 		\item [C2x (2023?)]\footnote{\url{https://en.wikipedia.org/wiki/C2x}}
 	\end{description}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Existe mesmo uma linguagem ``Embedded C'' ?}
+	\frametitle{Embedded C}
+	{Existe uma linguagem ``Embedded C'' ?}
+	\vspace*{0.5cm}
 	\begin{itemize}
-		\item Norma: \textit{Programming languages — C — Extensions to support embedded processors}
-		ISO/IEC TR 18037:2008
 		\item Tecnicamente é apenas uma extensão do C, cobrindo:
 	\begin{itemize}
 		\item Aritmética de ponto fixo
 		\item Espaço de endereçamento
 		\item Endereçamento de hardware básico para I/O
 	\end{itemize}
+		\item Norma: \textit{Programming languages — C — Extensions to support embedded processors}
+		ISO/IEC TR 18037:2008
 	\end{itemize}
 \end{frame}
 
@@ -110,7 +112,7 @@
 	\frametitle{Palavras Reservadas}
 	\begin{itemize}
 	\item Não devem ser usadas como nomes de funções ou variáveis
-	\item São \textit{case sensitives}
+	\item São \textit{case sensitive}
 	\item Em azul, as adições do C11 em relação ao C99
 \end{itemize}
 \vspace*{0.5cm}
@@ -137,18 +139,21 @@
 	%\end{center}
 \end{frame}
 
+\section{Organização de arquivos de inclusão}
+	
 \begin{frame}
 	\frametitle{Organização dos arquivos de inclusão}
 	\begin{columns}[T] % align columns
-		\begin{column}{.60\textwidth}
+		\begin{column}{.450\textwidth}
 			\lstinputlisting[style=customc]{code/demo.h}
 		\end{column}%
 		\hfill%
-		\begin{column}{.40\textwidth}
+		\begin{column}{.55\textwidth}
 			\begin{itemize}
 				\item Pense como API: só exporte interfaces e o que elas precisarem !
 				\item Não esqueça a proteção de inclusão recursiva !
 				\item Não é ANSI-C mas \texttt{\textcolor{blue}{\#pragma once}} pode ser interessante
+				\item Não definir variáveis ou funções em .h
 				\item Evite colocar arquivos de inclusão em .h (boa prática)
                 \item E o \texttt{\textcolor{blue}{\_\_cplusplus}} e \texttt{\textcolor{blue}{extern ``C''}} ?
 			\end{itemize}
@@ -159,8 +164,8 @@
 \begin{frame}[fragile]
 	\frametitle{Name mangling ou name decoration}
 		\begin{itemize}
-			\item É uma forma de adicionar informações adicionais a nomes de funções, variáveis, etc, de forma a remover ambiguidade e gerar informação adicional ao linker\footnote{{\tiny\url{ https://stackoverflow.com/questions/41524956/gcc-c-name-mangling-reference}}}.
-			\item Por exemplo, como o compilador irá gerar nomes únicos para uma função com overloading em C++ ?
+			\item É uma forma de adicionar informações adicionais a nomes de funções, variáveis, etc, de forma a remover ambiguidade e gerar informação adicional ao linker\footnote{{\tiny\url{ https://bit.ly/3CuvCYe}}}.
+			\item Por exemplo, como o compilador C++ irá gerar nomes únicos para uma função com \textit{overloading} ?
             	\begin{lstlisting}[style=customc]
 void accel_read(float &x, float &y, float &x) {}
 void accel_read(accel_t &data) {};
@@ -178,19 +183,21 @@ void accel_read(accel_t &data) {};
 		\begin{itemize}
 			\item Logo, se você linkar um programa em C com outras partes em C++, o compilador C++ irá gerar um padrão de name decoration para as suas funções em C que é diferente dos símbolos gerados pelo C !
            \item A convenção de chamada padrão do C (\texttt{\textcolor{blue}{\_cdecl}})\footnote{\tiny{\url{https://en.wikipedia.org/wiki/Name_mangling}}} apenas adiciona ``\texttt{\textcolor{blue}{\_}}'' antes do nome das funções.
-           \item Assim, se declarar a função como \texttt{\textcolor{blue}{extern ``C'' void func(void);}} você está explicitando que a decoração de \texttt{\textcolor{blue}{func}} segue o padrão do C (\texttt{\textcolor{blue}{\_func}}).
-           \item O \texttt{\textcolor{blue}{\_\_cplusplus}} é a forma de identificar se quem está compilando o arquivo é o compilador C ou C++.
+           \item Assim, se declarar a função como \texttt{\textcolor{blue}{extern ``C'' void func(void);}} você está explicitando que a decoração de \texttt{\textcolor{blue}{func}} deve seguir o padrão do C (\texttt{\textcolor{blue}{\_func}}).
+           \item O \texttt{\textcolor{blue}{\_\_cplusplus}} é a forma de se identificar se é o compilador C++ quem está compilando o arquivo
 		\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{E o extern ?}
+	O externo permite explicitar a exportação do símbolo:
+	\vspace*{0.5cm}
 	\begin{description}
 	\item [Para variáveis:] diz para o compilador que a variável citada existe em algum lugar, não aloca memória para ela. O linker vai cuidar de ``encontrar'' onde a declaração foi feita.
 	\begin{verbatim}
 extern uint8_t buffer[16];
 	\end{verbatim}
-	\item [Para funções:]	explicita que a função tem linkagem externa, ou seja, o linker vai deixá-la disponível para ser ``encontrada'' por qualquer arquivo C. Esse é o default da linguagem. É o inverso do ``static''.
+	\item [Para funções:]	evidencia que a função tem linkagem externa, ou seja, o linker vai deixá-la disponível para ser ``encontrada'' por qualquer arquivo C. Esse é o default da linguagem. É o inverso do ``static''.
 	\end{description}
 		\vspace*{0.5cm}
 		\begin{center}
@@ -199,25 +206,32 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Arquivos de inclusão: modelo}
+	\frametitle{Arquivos de inclusão (exemplo)}
 	\lstinputlisting[style=customc]{code/accel.h}
 \end{frame}
 
+\section{Classes de armazenamento}
+
 \begin{frame}
-	\frametitle{Especificadores de classe de armazenamento}
-	\begin{center}
-		\texttt{\textcolor{blue}{extern static auto register}}
-	\end{center}
-		\vspace*{0.5cm}
+	\frametitle{Especificadores de classes de armazenamento}
 	\begin{itemize}
+	\item extern é uma das classes de armazenamento do C
 	\item Existem outros especificadores !
 	\item No entanto, precisamos entender antes como as variáveis são armazenadas e as seções de código !
 	\end{itemize}
+	\vspace*{0.5cm}
+	\begin{center}
+		\texttt{\textcolor{blue}{extern static auto register}}
+	\end{center}
+	
 \end{frame}
 
+\section{Seções de um programa}
+
 \begin{frame}
-	\frametitle{Seções de código e dados do programa}
-    Quando o programa é compilador, ele é divido em \textbf{seções}:
+	\frametitle{Seções de código e dados do programa para embarcados}
+    Quando o programa é compilador, ele é dividido em \textbf{seções}:
+    \vspace*{0.5cm}
     \begin{description}
     \item[text (flash):] Onde é armazenado o código executável de fato, geralmente em flash
     \item[rodata (flash):] Constantes do código (read only)
@@ -250,24 +264,29 @@ extern uint8_t buffer[16];
 \end{columns}
 \end{frame}
 
+\section{Uso da pilha}
+
 \begin{frame}
-	\frametitle{Stack (Pilha)}
+	\frametitle{Stack (Pilha) e heap}
+	\begin{itemize}
+	\item Stack:
 	\begin{itemize}
 		\item Geralmente usado para alocação de variáveis temporárias ou passagem de parâmetros.
-		\item É uma região linear de memória, gerida por um registro denominado de \textit{Stack Pointer}.
+		\item É uma região linear de memória, normalmente gerida por um registro denominado de \textit{Stack Pointer}.
 		\item O compilador analisa o código e gerar instruções para uso do stack.
+	\end{itemize}
+	\item Heap: uma área de memória reservada para as alocações dinâmicas de memória pelo programa (via chamadas como calloc/malloc)
 	\end{itemize}
 \end{frame}
 
 \begin{frame}
-	\frametitle{Stack (Pilha)}
+	\frametitle{Stack (Exemplo)}
 	\begin{columns}[T] % align columns
-	\begin{column}{.60\textwidth}
+	\begin{column}{.55\textwidth}
 		\lstinputlisting[style=customc]{code/stack.c}
 	\end{column}%
 	\hfill%
-    \pause
-	\begin{column}{.40\textwidth}
+	\begin{column}{.45\textwidth}
     {\footnotesize
 	\begin{itemize}
 	\item \texttt{global\_sum}: na seção data
@@ -292,7 +311,20 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Especificadores de classe de armazenamento}
+	\frametitle{Formas de dimensionamento da pilha}
+	\begin{itemize}
+		\item Análises estáticas
+		\begin{itemize}
+			\item Usando o próprio compilador (\texttt{-fstack-usage} e \texttt{-fcallgraph-info} no GCC) e analisando o uso da pilha a partir do \texttt{main()} (análise estática)
+			\item Usando ferramentas (PC-Lint, valgrind, cppcheck)
+			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ponteiros para função)
+		\end{itemize}
+		\item Análises dinâmicas: técnica da marca d'agua na região do stack (verificação dinâmica, útil em caso de recursão, interrupção)
+		\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Retomando: especificadores de classe de armazenamento}
 		Uso de static em variáveis e funções:
 	\vspace*{0.5cm}
 	\begin{itemize}
@@ -307,14 +339,27 @@ extern uint8_t buffer[16];
 	\end{itemize}
 \end{frame}
 
+%\begin{frame}
+%	\frametitle{Especificadores de classes de armazenamento}
+%		\begin{center}
+%		\texttt{\textcolor{blue}{static}}
+%		\end{center}
+%		\vspace*{0.5cm}
+%		\begin{itemize}
+%			\item Se usada com variáveis dentro de funções: gera variáveis que mantem valores entre chamadas e são alocadas na área de variáveis globais. São inicializadas com zero, caso não explicitamente especificado.
+%			\item Se usada com variáveis no escopo do arquivo (fora das funções) o comportamento é o mesmo mas existem diferenças em relação a sua visibilidade.
+%			\item \texttt{static} também pode ser usada em declarações de função. Novamente, implica em mudança de visibilidade.
+%			\item Novo conceito requerido: \textbf{linkagem padrão da linguagem C} !
+%		\end{itemize}
+%\end{frame}
+
 \begin{frame}
-	\frametitle{Stack (Pilha)}
+	\frametitle{Exemplo de static e variáveis locais}
 	\begin{columns}[T] % align columns
 		\begin{column}{.60\textwidth}
 			\lstinputlisting[style=customc]{code/static_var_fun.c}
 		\end{column}%
 		\hfill%
-        \pause
 		\begin{column}{.40\textwidth}
     {\footnotesize
 	\begin{itemize}
@@ -327,7 +372,7 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Retorno de valores locais, da pilha, pode ?}
+	\frametitle{Detalhes: retorno de valores locais, da pilha, pode ?}
 	\begin{center}
 	\lstinputlisting[style=customc]{code/stack_ret_a.c}
 	\end{center}
@@ -340,7 +385,7 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}
-	\frametitle{Retorno de valores locais, da pilha, pode ?}
+	\frametitle{Detalhes: retorno de valores locais, da pilha, pode ?}
 	\begin{center}
 		\lstinputlisting[style=customc]{code/stack_ret_b.c}
 	\end{center}
@@ -352,6 +397,78 @@ extern uint8_t buffer[16];
 \end{tikzpicture}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Especificadores de classes de armazenamento (auto)}
+\begin{columns}[T] % align columns
+	\begin{column}{.55\textwidth}
+		\lstinputlisting[style=customc]{code/auto.c}
+	\end{column}%
+	\hfill%
+	\begin{column}{.45\textwidth}
+		\begin{center}
+			\texttt{\textcolor{blue}{auto}}
+		\end{center}
+		\vspace*{0.5cm}
+		\begin{itemize}
+			\item É a classe padrão, de escopo local, armazenadas na RAM (pilha), valor inicial pode ser lixo.
+			\item Pode ser omitida, por simplicidade.
+		\end{itemize}
+	\end{column}%
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento (extern)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.57\textwidth}
+			\lstinputlisting[style=customc]{code/static_linkage_b.c}
+			\lstinputlisting[style=customc]{code/static_linkage_a.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.43\textwidth}
+			\begin{itemize}
+				\item Por default, o compilador C externa todos os símbolos gerados (main,var).
+				\item Com \texttt{extern}, você pode explicitamente dizer que existe algo externo ao seu arquivo (file2.c) e que pretende usar.
+			\item No entanto, mesmo que não especifique nada, o linker vai tentar encontrar algo na tabela de símbolos que resolva a referência.
+			\end{itemize}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento (static/extern)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.57\textwidth}
+			\lstinputlisting[style=customc]{code/static_linkage_e.c}
+			\lstinputlisting[style=customc]{code/static_linkage_d.c}
+			\lstinputlisting[style=customc]{code/static_linkage_c.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.43\textwidth}
+			\begin{itemize}
+				\item Agora \texttt{var} tem \textbf{linkagem interna}, não é mais vista fora de file2.c (o símbolo não é exportado)
+				\item Conceito também válido para funções \texttt{static} !
+				\item Princípio de encapsulamento ou API.
+			\end{itemize}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Especificadores de classe de armazenamento}
+	\begin{center}
+		\texttt{\textcolor{blue}{register}}
+	\end{center}
+	\vspace*{0.5cm}
+	\begin{itemize}
+		\item Se usada com variáveis dentro de funções.
+		\item Indica ao compilador que deseja o armazenamento da variável em um registro do processador (geralmente para maior performance).
+		\item Pouco útil atualmente, em geral o compilador resolve bem essas situações.
+	\end{itemize}
+\end{frame}
+
+\section{Passagem por valor e referência}
+
 \begin{frame}[fragile]
 	\frametitle{Passagem por valor x passagem por referência}
 	\begin{itemize}
@@ -359,7 +476,7 @@ extern uint8_t buffer[16];
 		\item Passagem por referência:
 		\begin{itemize}
 			\item O valor original não é copiado e pode ser alterado pela função.
-            \item É utilizado um ponteiro para essa operação, ou seja, deve ser passada o endereço do dado (referência) e não o seu valor.
+            \item É utilizado um ponteiro para essa operação, ou seja, deve ser passado o endereço do dado (referência) e não o seu valor.
 			\item Também é interessante quando se passam estruturas muito grandes, economizando memória e processamento
 		\end{itemize}
 	\end{itemize}
@@ -382,6 +499,8 @@ extern uint8_t buffer[16];
 %    É preciso falar um pouco mais sobre ponteiros !
 \end{frame}
 
+\section{Uso de ponteiros}
+
 \begin{frame}[fragile]
 	\frametitle{Ponteiros}
 	\begin{itemize}
@@ -389,7 +508,7 @@ extern uint8_t buffer[16];
 		\item São referências indiretas para outras variáveis ou funções
 		\item São declarados com o emprego do asterisco \texttt{\textcolor{blue}{``*''}}
 		\item Endereços de variáveis podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
-		\item Declaração básica de variável ponteiro:
+		\item Declaração básica de uma variável ponteiro:
 	\end{itemize}
     {\footnotesize
 	\begin{verbatim}
@@ -401,7 +520,7 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Ponteiros para variáveis simples}
+	\frametitle{Ponteiros para variáveis}
 	\begin{columns}[T] % align columns
 	\begin{column}{.50\textwidth}
 		\lstinputlisting[style=customc]{code/ptr_a.c}
@@ -429,7 +548,7 @@ extern uint8_t buffer[16];
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Ponteiros para estruturas simples}
+	\frametitle{Ponteiros para estruturas}
 	\begin{columns}[T] % align columns
 	\begin{column}{.75\textwidth}
 		\lstinputlisting[style=customc]{code/ptr_b.c}
@@ -532,7 +651,7 @@ TRAN[1] = 0x7FFD8F7F0DA8
 \begin{frame}
 	\frametitle{Ponteiros para função}
 	\begin{itemize}
-		\item Mas não precisa ser assim !
+		\item Mas não precisa ser confuso assim !
 		\item Acompanhe como criar um ponteiro pra função e como o programa se transforma depois disso.
 	\end{itemize}
 	\vspace*{0.5cm}
@@ -555,102 +674,7 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\lstinputlisting[style=customc]{code/ptr_fun_b.c}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Formas de dimensionamento da pilha}
-	\begin{itemize}
-		\item Análises estáticas
-		\begin{itemize}
-			\item Usando o próprio compilador (\texttt{-fstack-usage} e \texttt{-fcallgraph-info} no GCC) e analisando o uso da pilha a partir do \texttt{main()} (análise estática)
-			\item Usando ferramentas (PC-Lint, valgrind, cppcheck)
-			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ponteiros para função)
-		\end{itemize}
-		\item Análises dinâmicas: técnica da marca d'agua na região do stack (verificação dinâmica, útil em caso de recursão, interrupção)
-		\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Especificadores de classe de armazenamento (auto)}
-\begin{columns}[T] % align columns
-	\begin{column}{.60\textwidth}
-		\lstinputlisting[style=customc]{code/auto.c}
-	\end{column}%
-	\hfill%
-	\begin{column}{.40\textwidth}
-		\begin{center}
-			\texttt{\textcolor{blue}{auto}}
-		\end{center}
-		\vspace*{0.5cm}
-		\begin{itemize}
-			\item É a classe padrão, de escopo local, armazenadas na RAM (pilha), valor inicial pode ser lixo.
-			\item Pode ser omitida, por simplicidade.
-		\end{itemize}
-	\end{column}%
-\end{columns}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Especificadores de classe de armazenamento}
-		\begin{center}
-		\texttt{\textcolor{blue}{static}}
-		\end{center}
-		\vspace*{0.5cm}
-		\begin{itemize}
-			\item Se usada com variáveis dentro de funções: gera variáveis que mantem valores entre chamadas e são alocadas na área de variáveis globais. São inicializadas com zero, caso não explicitamente especificado.
-			\item Se usada com variáveis no escopo do arquivo (fora das funções) o comportamento é o mesmo mas existem diferenças em relação a sua visibilidade.
-			\item \texttt{static} também pode ser usada em declarações de função. Novamente, implica em mudança de visibilidade.
-			\item Novo conceito requerido: \textbf{linkagem padrão da linguagem C} !
-		\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Especificadores de classe de armazenamento (extern)}
-	\begin{columns}[T] % align columns
-		\begin{column}{.57\textwidth}
-			\lstinputlisting[style=customc]{code/static_linkage_b.c}
-			\lstinputlisting[style=customc]{code/static_linkage_a.c}
-		\end{column}%
-		\hfill%
-		\begin{column}{.43\textwidth}
-			\begin{itemize}
-				\item Por default, o compilador C externa todos os símbolos gerados (main,var).
-				\item Com \texttt{extern}, você pode explicitamente dizer que existe algo externo ao seu arquivo (file2.c) e que pretende usar.
-			\item No entanto, mesmo que não especifique nada, o linker vai tentar encontrar algo na tabela de símbolos que resolva a referência.
-			\end{itemize}
-		\end{column}%
-	\end{columns}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Especificadores de classe de armazenamento (static/extern)}
-	\begin{columns}[T] % align columns
-		\begin{column}{.57\textwidth}
-			\lstinputlisting[style=customc]{code/static_linkage_e.c}
-			\lstinputlisting[style=customc]{code/static_linkage_d.c}
-			\lstinputlisting[style=customc]{code/static_linkage_c.c}
-		\end{column}%
-		\hfill%
-		\begin{column}{.43\textwidth}
-			\begin{itemize}
-				\item Agora \texttt{var} tem \textbf{linkagem interna}, não é mais vista fora de file2.c (o símbolo não é exportado)
-				\item Conceito também válido para funções \texttt{static} !
-				\item Princípio de encapsulamento ou API.
-			\end{itemize}
-		\end{column}%
-	\end{columns}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Especificadores de classe de armazenamento}
-	\begin{center}
-		\texttt{\textcolor{blue}{register}}
-	\end{center}
-	\vspace*{0.5cm}
-	\begin{itemize}
-		\item Se usada com variáveis dentro de funções.
-		\item Indica ao compilador que deseja o armazenamento da variável em um registro do processador (geralmente para maior performance).
-		\item Pouco útil atualmente, em geral o compilador resolve bem essas situações.
-	\end{itemize}
-\end{frame}
+\section{Qualificadores const e volatile}
 
 \begin{frame}
 	\frametitle{Qualificadores}
@@ -697,27 +721,7 @@ void lcd_write(const uint8_t *const data)
 	\end{lstlisting}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Arquivos de código fonte (modelo)}
-	\begin{columns}[T] % align columns
-		\begin{column}{.60\textwidth}
-			\lstinputlisting[style=customc]{code/demo.c}
-		\end{column}%
-		\hfill%
-		\begin{column}{.40\textwidth}
-			\begin{itemize}
-				\item Externe via funções o acesso a seus dados internos (encapsulamento)
-				\item Dê escopo de arquivo para as suas funções e variáveis com \texttt{static} !
-				\item Salve RAM colocando como \texttt{const} o que for realmente constante.
-			\end{itemize}
-		\end{column}%
-	\end{columns}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Arquivos de código fonte (modelo)}
-	\lstinputlisting[style=customc]{code/accel.c}
-\end{frame}
+\section{Enumerações, estruturas e uniões}
 
 \begin{frame}[fragile]
 	\frametitle{Estruturas}
@@ -884,5 +888,32 @@ typedef struct kved_data_s
 		\end{column}%
 	\end{columns}
 \end{frame}
+
+\section{Organização de arquivos fonte}
+
+\begin{frame}
+	\frametitle{Arquivos de código fonte (modelo)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.60\textwidth}
+			\lstinputlisting[style=customc]{code/demo.c}
+		\end{column}%
+		\hfill%
+		\begin{column}{.40\textwidth}
+			\begin{itemize}
+				\item Externe via funções o acesso a seus dados internos (encapsulamento)
+				\item Dê escopo de arquivo para as suas funções e variáveis com \texttt{static} !
+				\item Salve RAM colocando como \texttt{const} o que for realmente constante.
+			\end{itemize}
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Arquivos de códigos fonte (Exemplo)}
+	\lstinputlisting[style=customc]{code/accel.c}
+\end{frame}
+
+
+
 
 \end{document}

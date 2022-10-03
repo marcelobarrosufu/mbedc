@@ -1,17 +1,21 @@
-// inclusoes da linguagem C
+// inclusoes da linguagem C (<>)
 
-// inclusoes do projeto
+// inclusoes do projeto ("")
 
 // defines internos
 
-// tipos de dados internas
+// declaracao de enumeracoes
+
+// declaracao tipos de dados internas
 // (estruturas, unioes, typedefs)
 
-// constante internas (const)
+// declaracao de constante internas (const)
 
-// variaveis internas (static)
+// declaracao de variaveis internas (static)
 
-// prototipos de funcoes internas
+// definicao de prototipos de funcoes internas
+// (static)
 
-// funcoes internas (static) 
-// ou exportadas (ver .h)
+// declaracao de funcoes internas (static) 
+
+// declaracao das funcoes externas (.h)

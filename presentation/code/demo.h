@@ -7,6 +7,8 @@ extern "C" {
 
 // defines
 
+// enumeracoes compartilhadas
+
 // tipos de dados compartilhados 
 // (estruturas, unioes, typedefs)
 
