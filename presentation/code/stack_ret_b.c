@@ -13,13 +13,13 @@ accel_t *accel_axis_get3(void)
 accel_t *accel_axis_get4(void)
 {
 	/* auto */ accel_t accel = { 0 };
-	accel_read(&accel_t);
+	accel_read(&accel);
 	return &accel;
 }
 accel_t *accel_axis_get5(void)
 {
 	static accel_t accel = { 0 };
-	accel_read(&accel_t);
+	accel_read(&accel);
 	return &accel;
 }
 
