@@ -10,7 +10,7 @@ int drv_init(void)
 	
 	if(!initialized)
 	{
-		for(size_t n = 0 ; n < DATA_SIZE, n++)
+		for(size_t n = 0 ; n < DATA_SIZE; n++)
 			data[n] = n;
 			
 		initialized = true;

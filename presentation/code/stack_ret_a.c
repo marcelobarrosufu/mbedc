@@ -12,13 +12,13 @@ uint32_t rand_perc(void)
 accel_t accel_axis_get1(void)
 {
 	accel_t accel = { 0 };
-	accel_read(&accel_t);
+	accel_read(&accel);
 	return accel;
 }
 accel_t accel_axis_get2(void)
 {
 	accel_t *accel = calloc(1,sizeof(accel_t));
-	accel_read(accel_t);
+	accel_read(accel);
 	return *accel;
 }
 
