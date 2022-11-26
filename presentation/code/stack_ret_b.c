@@ -7,7 +7,7 @@ typedef struct accel_s {
 accel_t *accel_axis_get3(void)
 {
 	accel_t *accel = calloc(1,sizeof(accel_t));
-	accel_read(accel_t);
+	accel_read(accel);
 	return accel;
 }
 accel_t *accel_axis_get4(void)
