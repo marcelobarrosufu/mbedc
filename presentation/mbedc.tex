@@ -71,7 +71,7 @@
 \end{frame}
 
 \section{Introdução}
-	
+
 \begin{frame}
 	\frametitle{Versões utilizadas}
 	\begin{itemize}
@@ -87,7 +87,7 @@
 		\item [K\&R (1978):] Primeira especificação informal.
 		\item [C89/C90 (1989/1990):] Adoção como padrão pela ANSI (C89) e depois pela ISO (C90).
 		\item [C99 (1999):] Primeira grande revisão do padrão, amplamente utilizada.
-		\item [C11 (2011):] Segunda revisão da linguagem. Aproximação ao C++. 
+		\item [C11 (2011):] Segunda revisão da linguagem. Aproximação ao C++.
 		\item [C17 (2018):] Sem características novas. Apenas correções.
 		\item [C2x (2023?)]\footnote{\url{https://en.wikipedia.org/wiki/C2x}}
 	\end{description}
@@ -144,11 +144,11 @@
 
 \begin{frame}
 	\frametitle{Diretivas de pré-processamento}
-	Permitem o processamento do arquivo C antes que ele seja compilador. Pode definir macros, incluir arquivos, selecionar partes do código que serão compiladas, gerar erros, etc. As mais importantes:
+	Permitem o processamento do arquivo C antes que ele seja compilado. Podem definir macros, incluir arquivos, selecionar partes do código que serão compiladas ou não, gerar erros, etc. As diretivas mais importantes são:
 \vspace*{0.5cm}
 \begin{itemize}
 	\item \texttt{\#include}
-	\item \texttt{\#define} e \texttt{\#undef} 
+	\item \texttt{\#define} e \texttt{\#undef}
 	\item \texttt{\#if}, \texttt{\#ifdef}, \texttt{\#ifndef}, \texttt{\#elif}, \texttt{\#else} e \texttt{\#endif}
 	\item \texttt{\#error}
 	\item \texttt{\#pragma}
@@ -165,31 +165,31 @@
 \begin{frame}[fragile]
 	\frametitle{Diretiva \texttt{\#include}}
 	Provavelmente a mais conhecida das diretivas. Permite a inclusão do conteúdo do arquivo citado antes da compilação.
-		
+
 	\begin{lstlisting}[style=customc]
 // Procura por inclusoes nos arquivos de inclusao do compilador
 #include <stdio.h>
-// Procura por inclusao no diretorio corrente ou em diretorios 
+// Procura por inclusoes no diretorio corrente ou em diretorios
 // indicados para o compilador (depende da implementacao)
 #include "gps.h"
 #include "drivers/accel.h"
 	\end{lstlisting}
 
-	Indicando para o compilador:
-	
+	Indicando diretórios de inclusão para o compilador:
+
 	\begin{lstlisting}[style=customc,language=bash]
 gcc -I<local1> -I<local2> ..
 gcc -I. -I.. -Iinc ...
 	\end{lstlisting}
 
 	Muitas vezes a IDE oculta esses detalhes do desenvolvedor mas eles devem ser informados em algum momento.
-	
+
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Diretivas \texttt{\#define} e \texttt{\#undef}}
+	\frametitle{Diretiva \texttt{\#define}}
 	Permite criar macros que serão posteriormente substituídas (\textit{object-like macros}) ou avaliadas como função (\textit{function-like macros}), sempre antes da compilação, na fase de pré-processamento dos arquivos fonte.
-	
+
 	\begin{lstlisting}[style=customc]
 // object-like macros (from gcc manual)
 //
@@ -210,8 +210,47 @@ int main(void)
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Diretivas \texttt{\#define} e \texttt{\#undef}}
-	Exemplos com function-like macros
+	\frametitle{Diretiva \texttt{\#define} (exemplo de herança)}
+
+	\begin{lstlisting}[style=customc]
+#include <stdio.h>
+#include <stdint.h>
+// it is too easy to change base class for all derived classes
+#define BASE_CLASS \
+    uint8_t id;    \
+    uint32_t size
+
+#define BASE_CLASS_INIT(a,b) (a),(b)
+
+typedef struct
+{
+	BASE_CLASS; // this position must be fixed if you use castings to base class
+    uint32_t member_a1;
+    uint32_t member_a2;
+} class_a;
+
+typedef struct
+{
+	BASE_CLASS; // this position must be fixed if you use castings to base class
+    uint32_t member_b1;
+    uint32_t member_b2;
+} class_b;
+
+int main()
+{
+    class_a a = { BASE_CLASS_INIT(1,10), 0 ,0};
+    class_b b = { BASE_CLASS_INIT(2,20), 0 ,0};
+    printf("Class a: %u, %u, %u, %u\r",a.id,a.size,a.member_a1,a.member_a2);
+    printf("Class b: %u, %u, %u, %u\r",b.id,b.size,b.member_b1,b.member_b2);
+
+    return 0;
+}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Diretiva \texttt{\#define}}
+	Exemplos com function-like macros:
 	\begin{lstlisting}[style=customc]
 // function-like macros ()
 //
@@ -222,16 +261,115 @@ int main(void)
 
 int main(void)
 {
-	printf("Min val is: %d\n",MIN_VAL(5,7));	
+	printf("Min val is: %d\n",MIN_VAL(5,7));
 	printf("90 degress in radians is %f\n",DEG2RAD(90));
 	return 0;
 }
 	\end{lstlisting}
+    \begin{itemize}
+    \item Podem ser passados vários argumentos e inclusive uma lista variável.
+    \item Considere se não é melhor ter uma função de fato.
+    \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]
+	\frametitle{Diretiva \texttt{\#define} (buffer circular)}
+	\begin{columns}[T] % align columns
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
+
+#define CBF_INC(v,mv) ((((v)+1) >= (mv)) ? 0 : (v)+1)
+
+typedef struct cbf_s
+{
+  volatile uint16_t prod;
+  volatile uint16_t cons;
+  uint16_t size;
+  uint8_t *buffer;
+} cbf_t;
+
+bool cbf_put(cbf_t *cb, uint8_t c)
+{
+  uint16_t next_prod = CBF_INC(cb->prod,cb->size);
+
+  if(next_prod == cb->cons)
+    return false;
+
+  cb->buffer[cb->prod] = c;
+  cb->prod = next_prod;
+  return true;
+}
+	\end{lstlisting}
+
+		\end{column}%
+		\hfill%
+		\begin{column}{.5\textwidth}
+	\begin{lstlisting}[style=customc]
+bool cbf_get(cbf_t *cb, uint8_t *c)
+{
+  if(cb->cons == cb->prod)
+    return false;
+
+  *c = cb->buffer[cb->cons];
+  cb->cons = CBF_INC(cb->cons,cb->size);
+  return true;
+}
+// ## is the token-pasting operator
+#define CBF_DECLARE_AND_INIT(name,sz)  \
+  static uint8_t name##buffer[sz + 1]; \
+  static cbf_t name = {                \
+    .prod = 0,                         \
+    .cons = 0,                         \
+    .size = sz+1,                      \
+    .buffer = name##buffer,            \
+}
+
+CBF_DECLARE_AND_INIT(eth_drv_cb,100);
+
+int main(void) {
+    uint8_t c;
+    cbf_put(&eth_drv_cb,'a');
+    cbf_get(&eth_drv_cb,&c);
+    printf("Char = %c\n",(char)c);
+    return 0;
+}
+	\end{lstlisting}
+
+		\end{column}%
+	\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Diretivas \texttt{\#if} e \texttt{\#error}}
+
+	\begin{lstlisting}[style=customc]
+// This define could be provided by command line:
+// gcc -DVERSION=2 ...
+
+#define VERSION 2
+
+#if VERSION == 1
+  #define INCFILE "vers1.h"
+#elif VERSION == 2
+  #define INCFILE "vers2.h" // and so on
+#else
+  // Generates an error message on console
+  #error "Wrong version !"
+#endif
+
+#include INCFILE
+
+// Ref: Example modified from C11 standard
+	\end{lstlisting}
+    No caso de uma versão inválida, teremos: \\
+    \includegraphics[scale=0.5]{imgs/error.png}
+\end{frame}
 
 \section{Organização de arquivos de inclusão}
-	
+
 \begin{frame}
 	\frametitle{Organização dos arquivos de inclusão}
 	\begin{columns}[T] % align columns
@@ -314,7 +452,7 @@ extern uint8_t buffer[16];
 	\begin{center}
 		\texttt{\textcolor{blue}{extern static auto register}}
 	\end{center}
-	
+
 \end{frame}
 
 \section{Seções de um programa}
@@ -798,7 +936,7 @@ TRAN[1] = 0x7FFD8F7F0DA8
 	\end{center}
 \end{frame}
 
-	
+
 \begin{frame}[fragile]
 	\frametitle{Qualificadores e ponteiros}
     Usar adequadamente o qualificador \texttt{const} com ponteiros é, frequentemente, uma boa prática:
