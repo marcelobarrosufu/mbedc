@@ -502,7 +502,7 @@ extern uint8_t buffer[16];
 	\begin{itemize}
 		\item Geralmente usado para alocação de variáveis temporárias ou passagem de parâmetros.
 		\item É uma região linear de memória, normalmente gerida por um registro denominado de \textit{Stack Pointer}.
-		\item O compilador analisa o código e gerar instruções para uso do stack.
+		\item O compilador analisa o código e gera instruções para uso do stack.
 	\end{itemize}
 	\item Heap: uma área de memória reservada para as alocações dinâmicas de memória pelo programa (via chamadas como calloc/malloc)
 	\end{itemize}
@@ -521,8 +521,8 @@ extern uint8_t buffer[16];
 	\item \texttt{global\_sum}: na seção data
     \item \texttt{data}: temporariamente no stack
     \item \texttt{sum}: temporariamente no stack
-    \item variáveis passadas na chamada da função \texttt{sum}: temporariamente no stack
-    \item retorno do valor da função \texttt{sum}:temporariamente  no stack
+    \item variáveis passadas na chamada da função \texttt{sum}: temporariamente no stack (ou via registros)
+    \item retorno do valor da função \texttt{sum}: temporariamente  no stack (ou via registros)
 	\end{itemize}
     }
 	\end{column}%
@@ -546,7 +546,7 @@ extern uint8_t buffer[16];
 		\begin{itemize}
 			\item Usando o próprio compilador (\texttt{-fstack-usage} e \texttt{-fcallgraph-info} no GCC) e analisando o uso da pilha a partir do \texttt{main()} (análise estática)
 			\item Usando ferramentas (PC-Lint, valgrind, cppcheck)
-			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ponteiros para função)
+			\item Problemas: podem falhar em casos de recursão, interrupções, chamadas indiretas (ex: ponteiros para função)
 		\end{itemize}
 		\item Análises dinâmicas: técnica da marca d'agua na região do stack (verificação dinâmica, útil em caso de recursão, interrupção)
 		\end{itemize}
@@ -592,8 +592,8 @@ extern uint8_t buffer[16];
 		\begin{column}{.40\textwidth}
     {\footnotesize
 	\begin{itemize}
-	\item \texttt{initialized}: na seção de variáveis globais mas sem visibilidade fora de \texttt{drv\_init}, com valore inicial \texttt{false} e mantendo o valor entre chamadas da função
-    \item \texttt{data}: idem, não penalizando o stack
+	\item \texttt{initialized}: na seção de variáveis globais mas sem visibilidade fora de \texttt{drv\_init}, com valor inicial \texttt{false} e mantendo o valor entre chamadas da função
+    \item \texttt{data}: idem (e não penalizando o stack)
 	\end{itemize}
     }
 		\end{column}%
@@ -641,6 +641,7 @@ extern uint8_t buffer[16];
 		\begin{itemize}
 			\item É a classe padrão, de escopo local, armazenadas na RAM (pilha), valor inicial pode ser lixo.
 			\item Pode ser omitida, por simplicidade.
+			\item Em C++ o significado é outro (inferência de tipo) !
 		\end{itemize}
 	\end{column}%
 \end{columns}
@@ -733,7 +734,7 @@ extern uint8_t buffer[16];
 \begin{frame}[fragile]
 	\frametitle{Ponteiros}
 	\begin{itemize}
-		\item Um ponteiro armazena endereço de memória e não um valor !
+		\item Um ponteiro armazena endereço de memória e não um valor qualquer !
 		\item São referências indiretas para outras variáveis ou funções
 		\item São declarados com o emprego do asterisco \texttt{\textcolor{blue}{``*''}}
 		\item Endereços de variáveis podem ser obtidos com o uso do operador \texttt{\textcolor{blue}{``\&''}}
@@ -1156,6 +1157,14 @@ typedef struct kved_data_s
 	\lstinputlisting[style=customc]{code/accel.c}
 \end{frame}
 
+\begin{frame}[fragile]
+\end{frame}
+
+\begin{frame}[fragile]
+\end{frame}
+
+\begin{frame}[fragile]
+\end{frame}
 
 
 
